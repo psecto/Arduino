@@ -2,7 +2,7 @@
 * Copyright © 2017 Psecto, Psecto Productions ltd, Mihai FLOARES
 */
 
-//Arduino + H bridge 2 powered Motors with separate 9V power supply
+//Arduino + H bridge 2 powered Motors with separate 9V power supply used to control Lego Technics Robotic arm
 
 // Define Arduino pins
 
