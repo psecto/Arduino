@@ -1,64 +1,129 @@
 /**
-* Copyright © 2017 Psecto, Psecto Productions ltd, Mihai FLOARES
+Name:        RobotClawWifiProject.ino
+Created:    12/1/2017 11:01:11 PM
+Author: Mihai Floares
+Copyright © 2017 Psecto, Psecto Productions ltd
 */
 
-//Arduino + H bridge 2 powered Motors with separate 9V power supply used to control Lego Technics Robotic arm
+//NODEMCU Development board and LEGO TECHNICS WiFi Controlled Robotic Arm project 
 
-// Define Arduino pins
+//Include wifi library
 
-const int Claw1 = 2;                
-const int Claw2 = 5;                 
-const int EnableClaw = 9;
+#include <ESP8266WiFi.h>
 
-const int Piston1 = 6;              
-const int Piston2 = 8;                  
-const int EnablePiston = 3;
+//Setup the Wifi connection
+
+const char* ssid = "Virus"; // WiFi name
+const char* password = "DarkAngel251986"; // WiFi password
+WiFiServer server(80);
+
+//Pin initialization (init)
+
+//Claw Pin init
+int Claw1 = 2; // D4
+int Claw2 = 14; // D5
+int ClawSwitch = 12; // D6
+                     //Piston Pin init
+int Piston1 = 5; // D1
+int Piston2 = 4; // D2
+int PistonSwitch = 0; //D3
+
+                      //Open Comms and declare Pins
+
+void setup() {
+    Serial.begin(115200);
+    delay(10);
+
+    //Declare Pin Type
+
+    //Claw
+    pinMode(Claw1, OUTPUT);
+    pinMode(Claw2, OUTPUT);
+    pinMode(ClawSwitch, OUTPUT);
+    //Piston
+    pinMode(Piston1, OUTPUT);
+    pinMode(Piston2, OUTPUT);
+    pinMode(PistonSwitch, OUTPUT);
+
+    //Declare init Pin State
+
+    //Claw
+    digitalWrite(Claw1, LOW);
+    digitalWrite(Claw2, LOW);
+    digitalWrite(ClawSwitch, LOW);
+    //Piston
+    digitalWrite(Piston1, LOW);
+    digitalWrite(Piston2, LOW);
+    digitalWrite(PistonSwitch, LOW);
 
 
-// Set pins as output
+    // Connect to WiFi network
 
-void setup()
-{
-  pinMode(EnableClaw, OUTPUT);  
-  pinMode(Claw1, OUTPUT);     
-  pinMode(Claw2, OUTPUT);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+    }
 
-  pinMode(EnablePiston, OUTPUT); 
-  pinMode(Piston1, OUTPUT);     
-  pinMode(Piston2, OUTPUT);     
+    // Start the server
+
+    server.begin();
+
 }
 
-//Actions
+void loop() {
+    // Check if a client has connected
 
-void loop()
-{
-      digitalWrite(Claw1, HIGH);
-      digitalWrite(Claw2, LOW);    
-      digitalWrite(EnableClaw, HIGH);
-      delay(2000);
-      digitalWrite(EnableClaw, LOW);
-      delay(5000);
+    WiFiClient client = server.available();
+    if (!client) {
+        return;
+    }
 
-      digitalWrite(Piston1, HIGH);
-      digitalWrite(Piston2, LOW);    
-      digitalWrite(EnablePiston, HIGH);
-      delay(3000);
-      digitalWrite(EnablePiston, LOW);
-      delay(5000);      
+    // Read the first line of the request
 
-      digitalWrite(Claw1, LOW);
-      digitalWrite(Claw2, HIGH);    
-      digitalWrite(EnableClaw, HIGH);
-      delay(14000);
-      digitalWrite(EnableClaw, LOW);
-      delay(2000);
+    String request = client.readStringUntil('\r');
+    client.flush();
 
-      digitalWrite(Piston2, HIGH);
-      digitalWrite(Piston1, LOW);    
-      digitalWrite(EnablePiston, HIGH);
-      delay(2000);
-      digitalWrite(EnablePiston, LOW);
-      delay(2000);
-         
-   }
+    // Match the request
+
+    if (request.indexOf("/ClawRelease") != -1) {
+        digitalWrite(Claw1, LOW);
+        digitalWrite(Claw2, HIGH);
+        digitalWrite(ClawSwitch, HIGH);
+        delay(2000);
+        digitalWrite(ClawSwitch, LOW);
+    }
+
+    if (request.indexOf("/ClawGrab") != -1) {
+        digitalWrite(Claw1, HIGH);
+        digitalWrite(Claw2, LOW);
+        digitalWrite(ClawSwitch, HIGH);
+        delay(2000);
+        digitalWrite(ClawSwitch, LOW);
+    }
+
+    if (request.indexOf("/PistonUp") != -1) {
+        digitalWrite(Piston1, LOW);
+        digitalWrite(Piston2, HIGH);
+        digitalWrite(PistonSwitch, HIGH);
+        delay(2000);
+        digitalWrite(PistonSwitch, LOW);
+    }
+
+    if (request.indexOf("/PistonDown") != -1) {
+        digitalWrite(Piston1, HIGH);
+        digitalWrite(Piston2, LOW);
+        digitalWrite(PistonSwitch, HIGH);
+        delay(2000);
+        digitalWrite(PistonSwitch, LOW);
+    }
+
+
+}
+
+/**
+
+WARNING: the code has reply, meaning that it will receive a request (ping) but not send a reply (pong) in return.
+Some OS (iPad for example) will attempt to sent 3 times the same request waiting for a reply
+
+*/
 
