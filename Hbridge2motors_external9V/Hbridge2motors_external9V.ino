@@ -13,8 +13,8 @@ Copyright © 2017 Psecto, Psecto Productions ltd
 
 //Setup the Wifi connection
 
-const char* ssid = "Virus"; // WiFi name
-const char* password = "DarkAngel251986"; // WiFi password
+const char* ssid = "SSID"; // WiFi name
+const char* password = "SSIDPassword"; // WiFi password
 WiFiServer server(80);
 
 //Pin initialization (init)
