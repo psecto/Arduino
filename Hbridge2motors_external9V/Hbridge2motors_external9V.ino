@@ -122,8 +122,8 @@ void loop() {
 
 /**
 
-WARNING: the code has reply, meaning that it will receive a request (ping) but not send a reply (pong) in return.
-Some OS (iPad for example) will attempt to sent 3 times the same request waiting for a reply
+WARNING: the code has no reply, meaning that it will receive a request (ping) but not send a reply (pong) in return.
+Some OS (iPad for example) will attempt to sent 3 times the same request waiting for a reply, this may cause functionality bugs on your final application
 
 */
 
